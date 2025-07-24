@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Карта со слоями</title>
+  <script src="https://api-maps.yandex.ru/2.1/?apikey=9dda63a0-a400-4fa1-bed5-024c6ad2056d&lang=ru_RU"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      left: 250px;
+      width: calc(100vw - 250px);
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: #f9f9f9;
+      border-right: 1px solid #ccc;
+      padding: 15px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      font-family: sans-serif;
+    }
+
+    .layer-group {
+      margin-bottom: 15px;
+    }
+
+    .layer-group label {
+      display: block;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-top: 0;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h3>Слои</h3>
+    <div class="layer-group">
+      <label><input type="checkbox" id="layer1" checked> Реабилитационные центры</label>
+      <label><input type="checkbox" id="layer2" checked> Социальные организации</label>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <script>
+    ymaps.ready(function () {
+      const map = new ymaps.Map("map", {
+        center: [54.7, 56.0],
+        zoom: 6
+      });
+
+      const layer1 = new ymaps.ObjectManager({ clusterize: true });
+      const layer2 = new ymaps.ObjectManager({ clusterize: true });
+
+      fetch('objects.json')
+        .then(res => res.json())
+        .then(data => layer1.add(data));
+
+      fetch('objects2.json')
+        .then(res => res.json())
+        .then(data => layer2.add(data));
+
+      map.geoObjects.add(layer1);
+      map.geoObjects.add(layer2);
+
+      document.getElementById('layer1').addEventListener('change', function () {
+        this.checked ? map.geoObjects.add(layer1) : map.geoObjects.remove(layer1);
+      });
+
+      document.getElementById('layer2').addEventListener('change', function () {
+        this.checked ? map.geoObjects.add(layer2) : map.geoObjects.remove(layer2);
+      });
+    });
+  </script>
+</body>
+</html>
