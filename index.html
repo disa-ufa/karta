@@ -5,28 +5,30 @@
   <title>Массовые точки Яндекс.Карты</title>
   <script src="https://api-maps.yandex.ru/2.1/?apikey=9dda63a0-a400-4fa1-bed5-024c6ad2056d&lang=ru_RU" type="text/javascript"></script>
   <style>
-    html, body, #map {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-    }
-    #panel {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: white;
-      border-radius: 6px;
-      padding: 10px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
-      z-index: 1000;
-      font-family: sans-serif;
-    }
-    #panel label {
-      display: block;
-      margin-bottom: 5px;
-    }
-  </style>
+  html, body, #map {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+  }
+  #panel {
+    position: absolute;
+    top: 60px; /* ниже строки поиска */
+    left: 10px;
+    background: white;
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    z-index: 10000; /* очень высокий */
+    font-family: sans-serif;
+  }
+  #panel label {
+    display: block;
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+</style>
+
 </head>
 <body>
   <div id="panel">
