@@ -2,60 +2,37 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Карта со слоями</title>
-  <script src="https://api-maps.yandex.ru/2.1/?apikey=9dda63a0-a400-4fa1-bed5-024c6ad2056d&lang=ru_RU"></script>
+  <title>Массовые точки Яндекс.Карты</title>
+  <script src="https://api-maps.yandex.ru/2.1/?apikey=9dda63a0-a400-4fa1-bed5-024c6ad2056d&lang=ru_RU" type="text/javascript"></script>
   <style>
-    body, html {
+    html, body, #map {
       margin: 0;
       padding: 0;
-    }
-
-    #map {
-      position: absolute;
-      top: 0;
-      left: 250px;
-      width: calc(100vw - 250px);
+      width: 100vw;
       height: 100vh;
     }
-
-    .sidebar {
-      width: 250px;
-      height: 100vh;
+    #panel {
       position: absolute;
-      top: 0;
-      left: 0;
-      background: #f9f9f9;
-      border-right: 1px solid #ccc;
-      padding: 15px;
-      box-sizing: border-box;
-      overflow-y: auto;
+      top: 10px;
+      left: 10px;
+      background: white;
+      border-radius: 6px;
+      padding: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      z-index: 1000;
       font-family: sans-serif;
     }
-
-    .layer-group {
-      margin-bottom: 15px;
-    }
-
-    .layer-group label {
+    #panel label {
       display: block;
       margin-bottom: 5px;
-      cursor: pointer;
     }
-
-    h3 {
-      font-size: 16px;
-      margin-top: 0;
-    }
-
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <h3>Слои</h3>
-    <div class="layer-group">
-      <label><input type="checkbox" id="layer1" checked> Реабилитационные центры</label>
-      <label><input type="checkbox" id="layer2" checked> Социальные организации</label>
-    </div>
+  <div id="panel">
+    <label><input type="checkbox" id="layer1" checked> Слой 1 (objects.json)</label>
+    <label><input type="checkbox" id="layer2" checked> Слой 2 (objects2.json)</label>
+    <label><input type="checkbox" id="layer3" checked> Слой 3 (objects3.json)</label>
   </div>
 
   <div id="map"></div>
@@ -67,27 +44,44 @@
         zoom: 6
       });
 
-      const layer1 = new ymaps.ObjectManager({ clusterize: true });
-      const layer2 = new ymaps.ObjectManager({ clusterize: true });
+      const objectManagers = {
+        layer1: new ymaps.ObjectManager({ clusterize: true }),
+        layer2: new ymaps.ObjectManager({ clusterize: true }),
+        layer3: new ymaps.ObjectManager({ clusterize: true })
+      };
 
-      fetch('objects.json')
-        .then(res => res.json())
-        .then(data => layer1.add(data));
+      const layerFiles = {
+        layer1: 'objects.json',
+        layer2: 'objects2.json',
+        layer3: 'objects3.json'
+      };
 
-      fetch('objects2.json')
-        .then(res => res.json())
-        .then(data => layer2.add(data));
-
-      map.geoObjects.add(layer1);
-      map.geoObjects.add(layer2);
+      for (const layerId in objectManagers) {
+        fetch(layerFiles[layerId])
+          .then(resp => resp.json())
+          .then(data => {
+            objectManagers[layerId].add(data);
+            map.geoObjects.add(objectManagers[layerId]);
+          });
+      }
 
       document.getElementById('layer1').addEventListener('change', function () {
-        this.checked ? map.geoObjects.add(layer1) : map.geoObjects.remove(layer1);
+        toggleLayer('layer1', this.checked);
+      });
+      document.getElementById('layer2').addEventListener('change', function () {
+        toggleLayer('layer2', this.checked);
+      });
+      document.getElementById('layer3').addEventListener('change', function () {
+        toggleLayer('layer3', this.checked);
       });
 
-      document.getElementById('layer2').addEventListener('change', function () {
-        this.checked ? map.geoObjects.add(layer2) : map.geoObjects.remove(layer2);
-      });
+      function toggleLayer(layerId, visible) {
+        if (visible) {
+          map.geoObjects.add(objectManagers[layerId]);
+        } else {
+          map.geoObjects.remove(objectManagers[layerId]);
+        }
+      }
     });
   </script>
 </body>
